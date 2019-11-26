@@ -11,8 +11,6 @@ bs4==0.0.1
 certifi==2019.9.11
 cffi==1.13.2
 chardet==3.0.4
-conda==4.7.12
-conda-package-handling==1.6.0
 cryptography==2.8
 cycler==0.10.0
 decorator==4.4.1
