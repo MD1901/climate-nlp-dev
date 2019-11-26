@@ -31,11 +31,12 @@ def web_scraper(k):
 
 
 def text_save(h):
+    print(h)
     newspaper = h[0]
     url = h[1]
     lang = h[2]
     response = requests.get(url)
-    soup = BeautifulSoup(response.text)
+    soup = BeautifulSoup(response.text, features="html.parser")
     data = []
     date = ""
     author = ""
