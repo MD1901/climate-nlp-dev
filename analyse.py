@@ -16,12 +16,14 @@ def searching_all_files(directory):
         if dir.is_dir():
             for file in dir.iterdir():
                 if file.is_file():
-                    file_list.append(file)
+                    file_list.append(str(file))
     return file_list
 
+
 def text_import():
-    german = spacy.load("de_core_news_sm")
-    english = spacy.load("en_core_web_sm")
+    models = {german = spacy.load("de_core_news_sm")
+    english = spacy.load("en_core_web_sm")}
+
     list_articles = []
     path_folder = Path.home() / "climate-nlp"
     for i in searching_all_files(path_folder):
@@ -43,6 +45,9 @@ def dict_import(lang):
     dict = {}
     if lang == "german" or lang == "english":
         with open(lang + "_wordlist.txt", "r") as f:
+            #  dict comprehension
+            # mydict = {key: value for something in something}
+            # mylist = [item for item in something]
             for line in f:
                 word, value = line.split("\t")
                 dict[word] = value
@@ -56,7 +61,6 @@ def polarity(text, lang):
     sum = 0
     dict = dict_import(lang)
     polarity_value = 0
-    a = True
     for word in text:
         if word.text in dict:
             sum += int(dict[word.text])
@@ -71,6 +75,10 @@ if __name__ == '__main__':
     number_articles = 0
     merkel_counter = 0
     trump_counter = 0
+
+    from collections import defaultdict
+
+    counter = defaultdict(int)
     for article in list_articles:
         polarity_list[article["url"]] = polarity(article["doc"], article["lang"])
         number_articles += 1
