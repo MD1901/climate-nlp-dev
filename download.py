@@ -1,32 +1,40 @@
-import requests
-from bs4 import BeautifulSoup
-from pathlib import Path
 import json
+from pathlib import Path
+import requests
+
+from bs4 import BeautifulSoup
+from googlesearch import search
 import nltk
 
-try:
-    from googlesearch import search
-except ImportError:
-    print("No module named 'google' found")
 
-def web_scraper(k):
-    website = k[0]
-    lang = k[1]
-    links = []
-    if lang == "german":
-        query = "Klimawandel site:" + website
 
-        for j in search(query, tld="co.in", num=100, start = 1, stop = 100):
-            links.append(j)
 
-    elif lang == "english":
-        query = "Climate Change site:" + website
+def web_scraper(newspaper, num_results=100):
+    """ returns links from a given newspaper """
 
-        for j in search(query, tld="co.in", num=100, start = 1, stop = 100):
-            links.append(j)
+    queries = {
+        "german": "Klimawandel site:",
+        "english": "Climate Change site:"
+    }
 
+    website, lang = newspaper
+
+    query = queries[lang] + website
+
+    links = [j for j in search(query, tld="co.in", num=num_results, start=1, stop=100)]
 
     return links
+
+
+def parse_guardian(soup):
+
+    return text
+
+newspaper_parsers = {
+    "guardian": parse_guardian
+}
+
+parser = newspaper_parsers[lang]
 
 
 
@@ -75,14 +83,31 @@ def text_save(h):
     with open(data_home / filename, 'w') as fp:
         json.dump(result, fp)
 
+
+def main(language, newspapers):
+    websites = []
+    for news in newspapers:
+        if news.language == language:
+            links = web_scraper(news)
+
+            for link in links:
+                websites.append((news.url, links, news.language))
+                print(websites[-1])
+                text_save(websites[-1])
+
 if __name__ == '__main__':
     newspapers = [["zeit.de", "german"], ["bild.de", "german"], ["theguardian.com", "english"], ["newyorker.com", "english"], ["nytimes.com", "english"], ["breitbart.com", "english"]]
 
-    websites = []
-    for j in newspapers:
-        for i in web_scraper(j):
-            websites.append([j[0],i, j[1]])
-    print(websites)
+    from collections import namedtuple
 
-    for j in websites:
-        text_save(j)
+    Newspaper = namedtuple('Newspaper', ['url', 'language'])
+
+    newspapers = [Newspaper(*tup) for tup in newspapers]
+
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--language', default="german", nargs='?')
+    args = parser.parse_args()
+
+    main(args.language, newspapers)
+
