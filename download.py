@@ -46,13 +46,21 @@ def text_save(h):
                 p["class"]
             except KeyError:
                 data.append(p.text)
+
     else:
         for p in soup.find_all("p"):
             data.append(p.text)
-
+    for t in soup.find_all("time"):
+        try:
+            date = t["datetime"]
+            print(date)
+            break
+        except KeyError:
+            break
     new = ""
     for d in data:
         new += " " + d
+    """ Unterordner für climate-nlp RAW"""
     data_home = Path.home() / "climate-nlp" / newspaper.replace(".","_")
     data_home.mkdir(parents=True, exist_ok=True)
 
@@ -67,13 +75,14 @@ def text_save(h):
     with open(data_home / filename, 'w') as fp:
         json.dump(result, fp)
 
+if __name__ == '__main__':
+    newspapers = [["zeit.de", "german"], ["bild.de", "german"], ["theguardian.com", "english"], ["newyorker.com", "english"], ["nytimes.com", "english"], ["breitbart.com", "english"]]
 
-newspapers = [["zeit.de", "german"], ["bild.de", "german"], ["theguardian.com", "english"], ["newyorker.com", "english"], ["nytimes.com", "english"]]
-websites = []
-for j in newspapers:
-    for i in web_scraper(j):
-        websites.append([j[0],i, j[1]])
-print(websites)
+    websites = []
+    for j in newspapers:
+        for i in web_scraper(j):
+            websites.append([j[0],i, j[1]])
+    print(websites)
 
-for j in websites:
-    text_save(j)
+    for j in websites:
+        text_save(j)
