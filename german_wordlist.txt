@@ -34,7 +34,6 @@ Abquetschring	-1
 Abraum	-1
 Abriegelung	-1
 Abrutsch	-1
-Absatz	-1
 Abschaltung	-1
 Abscheu	-1
 Abschreckung	-1
@@ -1651,7 +1650,6 @@ demoralisieren	-1
 demütigen	-1
 denkfaul	-1
 deprimieren	-1
-der	-1
 desillusionieren	-1
 desolat	-1
 desorientieren	-1
@@ -2253,7 +2251,7 @@ nichts	-1
 nichts gehen	-1
 nichts neu	-1
 nichtzulässig	-1
-nie der	-1
+nieder	-1
 nie wieder	-1
 niedergleitend	-1
 niederreißen	-1
@@ -2442,7 +2440,6 @@ schütteln	-1
 seekrank	-1
 sehnend	-1
 sehnsüchtig	-1
-sein	-1
 selbstanklagend	-1
 selbstherrlich	-1
 selbstmörderisch	-1
@@ -2861,7 +2858,6 @@ weichen	-1
 weinen	-1
 weithergeholt	-1
 welken	-1
-wer	-1
 wettbewerbswidrig	-1
 wickeln	-1
 widerlich	-1
