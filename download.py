@@ -71,7 +71,7 @@ def save_html(article):
     url = article[1]
     lang = article[2]
     response = requests.get(url)
-    data_home = Path.home() / "climate-nlp" / "RAW" /  newspaper.replace(".", "_")
+    data_home = Path.home() / "climate-nlp" / "raw" /  newspaper.replace(".", "_")
     data_home.mkdir(parents=True, exist_ok=True)
     filename = url.replace(".", "").replace(":", "").replace("/", "").replace("@", "") + ".html"
     with open(data_home / filename, 'w') as fp:
@@ -82,7 +82,7 @@ def open_html(newspapers):
     text = ""
     date = ""
     author = ""
-    data_html = Path.home() / "climate-nlp" / "RAW"
+    data_html = Path.home() / "climate-nlp" / "raw"
     newspaper_parsers = {
         "theguardian.com": parse_guardian
     }
@@ -97,7 +97,7 @@ def open_html(newspapers):
 
             except KeyError:
                 text, author, date = parse_standard(soup)
-            data_home = Path.home() / "climate-nlp" / "Articles" /  newspaper.replace(".", "_")
+            data_home = Path.home() / "climate-nlp" / "articles" /  newspaper.replace(".", "_")
             data_home.mkdir(parents=True, exist_ok=True)
             lang = "english"
             for news in newspapers:
