@@ -128,7 +128,7 @@ def main(language, news, onlyopen = False):
                     websites.append((new.url, link, new.language))
                     print(websites[-1])
                     save_html(websites[-1])
-                    open_html()
+        open_html(news)
     else:
         open_html(news)
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--language', default="english", nargs='?')
-    parser.add_argument('--onlyopen', default="False", nargs='?')
+    parser.add_argument('--onlyopen', default="0", nargs='?')
 
     args = parser.parse_args()
-    main(args.language, newspapers, bool(args.onlyopen))
+    main(args.language, newspapers, bool(int(args.onlyopen)))
