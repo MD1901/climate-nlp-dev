@@ -112,7 +112,7 @@ def open_html(newspapers):
                 "lang": lang
             }
             print(result)
-            filename = str(file_path).replace(".html",".json").replace("RAW", "Articles")
+            filename = str(file_path).replace(".html",".json").replace("raw", "articles")
             with open(filename, 'w') as fp:
                 json.dump(result, fp)
 
