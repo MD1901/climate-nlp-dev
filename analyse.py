@@ -21,7 +21,7 @@ def searching_all_files(directory):
 
 def text_import():
     local_list_articles = []
-    path_folder = Path.home() / "climate-nlp" / "Articles" 
+    path_folder = Path.home() / "climate-nlp" / "articles" 
     for file_path in searching_all_files(path_folder):
         print("Importing text from: " + file_path)
         with open(file_path, 'r') as json_file:
