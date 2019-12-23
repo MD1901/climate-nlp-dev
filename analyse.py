@@ -68,6 +68,7 @@ def sentence_polarity(sentence):
 
     for word in reversed(sentence):
         if word.dep_ == "neg":
+            #  should this change the polarity of the whole sentence???
             polarity_sum = -0.7 * polarity_sum
         elif words_shift[word] == "shifter":
             if words_pol[word] == 0:
@@ -101,13 +102,14 @@ def polarity(text, lang):
 if __name__ == '__main__':
     list_articles = text_import()
     polarity_list = {}
-    number_articles = 200
+    number_articles = 2
     counter = 0
     for article in list_articles:
         if counter >= number_articles :
             break
         polarity_list[article["url"]] = polarity(article["body"], article["lang"])
         counter += 1
+        print(counter)
 
     best_polarity = min(polarity_list.items(), key=operator.itemgetter(1))
     best_article = ""
