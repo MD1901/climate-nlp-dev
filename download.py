@@ -137,7 +137,7 @@ if __name__ == '__main__':
     newspapers = [["zeit.de", "german"], ["bild.de", "german"],
                   ["theguardian.com", "english"], ["newyorker.com", "english"],
                   ["nytimes.com", "english"], ["breitbart.com", "english"]]
-
+#Test
 
     Newspaper = namedtuple('Newspaper', ['url', 'language'])
 
