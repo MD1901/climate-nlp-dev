@@ -96,6 +96,10 @@ def polarity(text, lang):
         polarity_sum += sentence_polarity(sentence)
     print(str(polarity_sum) + ": " + text)
     return polarity_sum
+def save_list(pol_list):
+    result = ""
+    for item in list:
+
 
 
 if __name__ == '__main__':
@@ -108,7 +112,7 @@ if __name__ == '__main__':
             break
         polarity_list[article["url"]] = polarity(article["body"], article["lang"])
         counter += 1
-
+        
     best_polarity = min(polarity_list.items(), key=operator.itemgetter(1))
     best_article = ""
     for article in list_articles:
