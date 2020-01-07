@@ -85,10 +85,12 @@ def open_html(newspapers):
                         print(lang)
                 json_filepath = str(file_path).replace(".html",".json")
                 url = ""
+                id = str(file_path).split("/")[-1].replace(".html", "")
                 with open(json_filepath, 'r') as json_file:
                     data = json.load(json_file)
                     url = data["url"]
                 result = {
+                    "id": id,
                     "url": url,
                     "body": text,
                     "date": date,
