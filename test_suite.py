@@ -12,7 +12,4 @@ def test_polarity_with_shifter():
 
 def text_polarity_with_shifter_other_lexicon():
     model = polarity_analyser.polarity_with_shifter("Das hier ist der erste Testsatz",
-                                                     1)
-
-
-
+                                                     True)
