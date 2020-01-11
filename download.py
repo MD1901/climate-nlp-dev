@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search
 
+
 def web_scraper(newspaper, num_results=100):
     """ returns links from a given newspaper """
     queries = {
@@ -30,25 +31,38 @@ def save_html(article):
     with open(data_home / filename, 'w') as fp:
         fp.write(response.text)
 
-    json_text = {
-        "url": url
-    }
+    json_text = {"url": url}
     json_filename = url.split("/")[-1] + ".json"
     with open(data_home / json_filename, 'w') as fp:
         json.dump(json_text, fp)
 
-def import_newspapers():
+
+def import_newspapers(single=None):
     with open("listofwebsites.json", "r") as listofwebsites:
         newspapers = json.load(listofwebsites)
 
     newspapers = [Newspaper(tup["url"], tup["lang"]) for tup in newspapers]
+    if single:
+        newspapers = [n for n in newspapers if single in n.url]
     print(newspapers)
     return newspapers
+
+def remove_links(links):
+
+    avoids = ['bitesize', ]
+
+    for avoid in avoids:
+        links = [l for l in links if avoid not in l]
+
+    return links
+
+
 def main(language, news):
     websites = []
     for new in news:
         if new.language == language:
             links = web_scraper(new)
+            links = remove_links(links)
 
             for link in links:
                 websites.append((new.url, link, new.language))
@@ -58,17 +72,9 @@ def main(language, news):
 
 Newspaper = namedtuple('Newspaper', ['url', 'language'])
 if __name__ == '__main__':
-    newspapers = import_newspapers()
+    newspapers = import_newspapers('fox')
     parser = argparse.ArgumentParser()
     parser.add_argument('--language', default="english", nargs='?')
 
     args = parser.parse_args()
-    newspapers = [
-        # Newspaper('foxnews.com', 'english'),
-        Newspaper('bbc.com', 'english'),
-        Newspaper('theaustralian.com.au', 'english'),
-        Newspaper('telegraph.co.uk', 'english'),
-        Newspaper('news.sky.com/uk', 'english'),
-        Newspaper('skynews.com.au', 'english')
-    ]
     main(args.language, newspapers)

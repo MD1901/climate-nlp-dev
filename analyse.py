@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_id', default='polarity-shifter', nargs='?')
+    parser.add_argument('--model_id', default='simple-sentence', nargs='?')
     args = parser.parse_args()
 
     from test_polarity import ModelWrapper
@@ -70,10 +70,20 @@ if __name__ == '__main__':
         'simple-sentence': ModelWrapper(polarity_dict)
     }
 
-    list_articles = text_import()
+    links = text_import()
+
+    avoids = ['zfd6n39', ]
+
+    link = links[-1]
+    print(link['url'])
+
+    for avoid in avoids:
+        links = [l for l in links if avoid not in l['url']]
+
     polarity_list = []
     counter = 0
     model = models[args.model_id]
+    list_articles = links
     for article in list_articles:
         # polarity_list[["id"]] = sum))
         body = article["body"]
@@ -88,16 +98,24 @@ if __name__ == '__main__':
             }
         )
 
-    doc_id = 'what-will-another-decade-of-climate-crisis-bring'
-    doc = [doc for doc in polarity_list
-           if doc['id'][:len(doc_id)] == doc_id][0]
+
+    def find_doc(doc_id, polarity_list):
+        for doc in polarity_list:
+            if doc['id']:
+                if doc['id'][:len(doc_id)] == doc_id:
+                    return doc
+
+        return None
+
 
     def add_document_statistics(doc):
         doc['polarities'] = [res[1] for res in doc['result']]
-        doc['sum'] = sum(doc['polarities'])
+        doc['sum'] = sum(doc['polarities']) / len(doc['polarities'])
         doc['newspaper'] = doc['url'].split('/')[2]
         return doc
 
+    doc_id = 'what-will-another-decade-of-climate-crisis-bring'
+    doc = find_doc(doc_id, polarity_list)
     docs = [add_document_statistics(doc) for doc in polarity_list]
 
     import matplotlib.pyplot as plt
@@ -111,9 +129,7 @@ if __name__ == '__main__':
     f.savefig('word-polarities.png')
 
     df = pd.DataFrame(docs)
-    df.drop(['body', 'result' , 'polarities'], inplace=True, axis=1)
-    print(df.sort_values('sum').head(10))
-    print(df.sort_values('sum', ascending=False).head(10))
+    df.drop(['id', 'body', 'result' , 'polarities', 'url'], inplace=True, axis=1)
 
     f, a = plt.subplots()
     a.hist(df.loc[:, 'sum'])
@@ -121,14 +137,24 @@ if __name__ == '__main__':
 
     # groupby newspaper
     papers = df.groupby('newspaper').mean()
-    print(papers)
+
+    print(df.sort_values('sum').head(10))
+    print(' ')
+    print(df.sort_values('sum', ascending=False).head(10))
+    # print(papers)
     from yattag import Doc
 
-    def save_html(sentences):
-        doc, tag, text = Doc().tagtext()
+    def save_html(doc, sentences, out_file):
+        document, tag, text = Doc().tagtext()
 
         with tag('html'):
             with tag('body'):
+                with tag('p'):
+                    text('sum {} wc {} {}'.format(
+                        doc['sum'],
+                        len(doc['polarities']),
+                        doc['url']
+                    ))
 
                 # for word, polarity in result:
                 for sentence in sentences:
@@ -146,23 +172,31 @@ if __name__ == '__main__':
                             with tag('span', style="color: {}".format(clr)):
                                 text(word + ' ')
 
-        result = doc.getvalue()
+        result = document.getvalue()
 
-        with open('out.html', 'w') as fi:
+        with open(out_file, 'w') as fi:
             fi.write(result)
 
     #  class Word TODO
 
-    # split into sentences
-    sentences = []
-    sentence = []
-    for word, polarity in doc['result']:
-        sentence.append((word, polarity))
-        if word:
-            if word[-1] == '.':
-                sentences.append(sentence)
-                sentence = []
 
-    save_html(sentences)
+    def split_and_save_html(doc_id, polarity_list):
+        doc = find_doc(doc_id, polarity_list)
+        # split into sentences
+        sentences = []
+        sentence = []
+        for word, polarity in doc['result']:
+            sentence.append((word, polarity))
+            if word:
+                if word[-1] == '.':
+                    sentences.append(sentence)
+                    sentence = []
+
+        save_html(doc, sentences, out_file='./html/{}.html'.format(doc_id))
+
+    html_docs = ('_6119935251001', 'committee-on-climate-change')
+    # for doc_id in html_docs:
+    for doc_id in df.loc[:, 'clean-id'].values:
+        split_and_save_html(doc_id, polarity_list)
 
 
