@@ -124,27 +124,45 @@ if __name__ == '__main__':
     print(papers)
     from yattag import Doc
 
-    def save_html(result):
+    def save_html(sentences):
         doc, tag, text = Doc().tagtext()
 
         with tag('html'):
             with tag('body'):
 
-                for word, polarity in result:
+                # for word, polarity in result:
+                for sentence in sentences:
                     with tag('p'):
-                        clr = '#000000'
-                        if polarity > 0:
-                            clr = '#00cc00'
-                            word += ' ({})'.format(polarity)
-                        elif polarity < 0:
-                            clr = '#ff0000'
-                            word += ' ({})'.format(polarity)
-                        with tag('span', style="color: {}".format(clr)):
-                            text(word)
+
+                        for word, polarity in sentence:
+
+                            clr = '#000000'
+                            if polarity > 0:
+                                clr = '#00cc00'
+                                word += ' ({})'.format(polarity)
+                            elif polarity < 0:
+                                clr = '#ff0000'
+                                word += ' ({})'.format(polarity)
+                            with tag('span', style="color: {}".format(clr)):
+                                text(word + ' ')
 
         result = doc.getvalue()
 
         with open('out.html', 'w') as fi:
             fi.write(result)
 
-    save_html(doc['result'])
+    #  class Word TODO
+
+    # split into sentences
+    sentences = []
+    sentence = []
+    for word, polarity in doc['result']:
+        sentence.append((word, polarity))
+        if word:
+            if word[-1] == '.':
+                sentences.append(sentence)
+                sentence = []
+
+    save_html(sentences)
+
+

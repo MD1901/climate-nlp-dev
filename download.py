@@ -41,7 +41,6 @@ def import_newspapers():
     with open("listofwebsites.json", "r") as listofwebsites:
         newspapers = json.load(listofwebsites)
 
-    Newspaper = namedtuple('Newspaper', ['name', 'language'])
     newspapers = [Newspaper(tup["url"], tup["lang"]) for tup in newspapers]
     print(newspapers)
     return newspapers
@@ -52,15 +51,24 @@ def main(language, news):
             links = web_scraper(new)
 
             for link in links:
-                websites.append((new.name, link, new.language))
+                websites.append((new.url, link, new.language))
                 print(websites[-1])
                 save_html(websites[-1])
 
 
+Newspaper = namedtuple('Newspaper', ['url', 'language'])
 if __name__ == '__main__':
     newspapers = import_newspapers()
     parser = argparse.ArgumentParser()
     parser.add_argument('--language', default="english", nargs='?')
 
     args = parser.parse_args()
+    newspapers = [
+        # Newspaper('foxnews.com', 'english'),
+        Newspaper('bbc.com', 'english'),
+        Newspaper('theaustralian.com.au', 'english'),
+        Newspaper('telegraph.co.uk', 'english'),
+        Newspaper('news.sky.com/uk', 'english'),
+        Newspaper('skynews.com.au', 'english')
+    ]
     main(args.language, newspapers)
