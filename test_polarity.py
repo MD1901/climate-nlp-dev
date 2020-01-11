@@ -38,10 +38,13 @@ class ModelWrapper:
     def __init__(self, polarity_dict):
         self.polarity_dict = polarity_dict
 
+    # untested
     def analyse(self, text):
         sentence = text.split(' ')
         sentence = [w.lower() for w in sentence]
-        return sum(get_simple_sentence_polarity(sentence, self.polarity_dict)) / len(sentence)
+        polarities = get_simple_sentence_polarity(sentence, self.polarity_dict)
+        assert len(sentence) == len(polarities)
+        return [(word, pol) for word, pol in zip(sentence, polarities)]
 
 @pytest.mark.parametrize(
     'sentence, expected, polarity_dict',

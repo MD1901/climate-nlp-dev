@@ -8,6 +8,8 @@ about climate change and use nlp to do a sentiment analysis afterwards.
 - lexicon senitment - word level
 - polarity shifting / spacy - sentence level
 
+unavoidable success vs unavoidable failure
+
 ## `data/negation.txt`
 
 ## `data/intensity.txt`

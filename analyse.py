@@ -42,15 +42,14 @@ def save_list(pol_list):
 
 
 if __name__ == '__main__':
+    # do we need a word class? is_neg, intensity
+    # norm by count, maybe scale by frequency
+    # https://www.youtube.com/watch?v=By4IZeIzxIw min 9:30
+    # count num pos versus num neg
 
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_id', default='polarity-shifter', nargs='?')
-    # parser.add_argument('--log_every', default=100, nargs='?')
-    # parser.add_argument('--save_every', default=1000, nargs='?')
-    # parser.add_argument('--epochs', default=10, nargs='?')
-    # parser.add_argument('--data', default='local', nargs='?')
-    # parser.add_argument('--dataset', default='random-rollouts', nargs='?')
     args = parser.parse_args()
 
     from test_polarity import ModelWrapper
@@ -73,17 +72,79 @@ if __name__ == '__main__':
 
     list_articles = text_import()
     polarity_list = []
-    number_articles = 200
     counter = 0
     model = models[args.model_id]
     for article in list_articles:
         # polarity_list[["id"]] = sum))
-
+        body = article["body"]
+        result = model.analyse(body)
         polarity_list.append(
-            {'id': article["id"], "sum": model.analyse(article["body"])}
+            {
+                'url': article['url'],
+                'id': article["id"],
+                'clean-id': article['id'].split('?')[0],
+                'body': body,
+                "result": result,
+            }
         )
 
-    polarity_list = pd.DataFrame(polarity_list)
+    doc_id = 'what-will-another-decade-of-climate-crisis-bring'
+    doc = [doc for doc in polarity_list
+           if doc['id'][:len(doc_id)] == doc_id][0]
 
-    # save_list(polarity_list)
+    def add_document_statistics(doc):
+        doc['polarities'] = [res[1] for res in doc['result']]
+        doc['sum'] = sum(doc['polarities'])
+        doc['newspaper'] = doc['url'].split('/')[2]
+        return doc
 
+    docs = [add_document_statistics(doc) for doc in polarity_list]
+
+    import matplotlib.pyplot as plt
+
+    corpus_polarities = []
+    for doc in docs:
+        corpus_polarities.extend(doc['polarities'])
+
+    f, a = plt.subplots()
+    a.hist(corpus_polarities)
+    f.savefig('word-polarities.png')
+
+    df = pd.DataFrame(docs)
+    df.drop(['body', 'result' , 'polarities'], inplace=True, axis=1)
+    print(df.sort_values('sum').head(10))
+    print(df.sort_values('sum', ascending=False).head(10))
+
+    f, a = plt.subplots()
+    a.hist(df.loc[:, 'sum'])
+    f.savefig('doc-polarities.png')
+
+    # groupby newspaper
+    papers = df.groupby('newspaper').mean()
+    print(papers)
+    from yattag import Doc
+
+    def save_html(result):
+        doc, tag, text = Doc().tagtext()
+
+        with tag('html'):
+            with tag('body'):
+
+                for word, polarity in result:
+                    with tag('p'):
+                        clr = '#000000'
+                        if polarity > 0:
+                            clr = '#00cc00'
+                            word += ' ({})'.format(polarity)
+                        elif polarity < 0:
+                            clr = '#ff0000'
+                            word += ' ({})'.format(polarity)
+                        with tag('span', style="color: {}".format(clr)):
+                            text(word)
+
+        result = doc.getvalue()
+
+        with open('out.html', 'w') as fi:
+            fi.write(result)
+
+    save_html(doc['result'])
