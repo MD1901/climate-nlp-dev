@@ -42,11 +42,48 @@ def save_list(pol_list):
 
 
 if __name__ == '__main__':
+
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_id', default='polarity-shifter', nargs='?')
+    # parser.add_argument('--log_every', default=100, nargs='?')
+    # parser.add_argument('--save_every', default=1000, nargs='?')
+    # parser.add_argument('--epochs', default=10, nargs='?')
+    # parser.add_argument('--data', default='local', nargs='?')
+    # parser.add_argument('--dataset', default='random-rollouts', nargs='?')
+    args = parser.parse_args()
+
+    from test_polarity import ModelWrapper
+
+    import pandas as pd
+    polarity_dict = pd.read_csv('./data/polarity.txt')
+
+    new = {}
+    for row in range(polarity_dict.shape[0]):
+        try:
+            new[polarity_dict.iloc[row, 0]] = int(polarity_dict.iloc[row, 1])
+        except:
+            pass
+
+    polarity_dict = new
+    models = {
+        # 'polarity-shifter': Polarity_with_shifter("english"),
+        'simple-sentence': ModelWrapper(polarity_dict)
+    }
+
     list_articles = text_import()
-    polarity_list = {}
+    polarity_list = []
     number_articles = 200
     counter = 0
-    model = Polarity_with_shifter("english")
+    model = models[args.model_id]
     for article in list_articles:
-        polarity_list[article["id"]] = model.analyse(article["body"])
-    save_list(polarity_list)
+        # polarity_list[["id"]] = sum))
+
+        polarity_list.append(
+            {'id': article["id"], "sum": model.analyse(article["body"])}
+        )
+
+    polarity_list = pd.DataFrame(polarity_list)
+
+    # save_list(polarity_list)
+

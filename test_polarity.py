@@ -8,25 +8,24 @@ TDD
 
 
 Intensity
+
+todo == dobule negatives NO (shouldn't happen a lot in newspapers)
+
+Assuming ’ -> '
 """
 
 import pytest
+
+
 polarity_dict = {
-    'abandon': -20,
-    'threat': -20,
     'success': 20,
     'improve': 20,
     'sick': -20,
     'sparkle': 30,
     'son-of-a-bitch': -50,
     'hope': 20,
-    'pollute': -20
-}
-
-shifting_dict = {
-    'abandon': 1,
-    'improve': 1,
-    'threat': 1,
+    'pollute': -20,
+    'fail': -20
 }
 
 
@@ -34,57 +33,76 @@ def get_simple_sentence_polarity(sentence, polarity_dict):
     # check on stop words
     return [polarity_dict.get(word, 0) for word in sentence]
 
+
+class ModelWrapper:
+    def __init__(self, polarity_dict):
+        self.polarity_dict = polarity_dict
+
+    def analyse(self, text):
+        sentence = text.split(' ')
+        sentence = [w.lower() for w in sentence]
+        return sum(get_simple_sentence_polarity(sentence, self.polarity_dict)) / len(sentence)
+
 @pytest.mark.parametrize(
     'sentence, expected, polarity_dict',
     [
-        (('climate', 'change', 'threat', 'success'), 0, polarity_dict),
+        (('climate', 'change', 'success'), 20, polarity_dict),
         (('climate', 'improve', 'sick'), 0, polarity_dict),
         (('sparkle', 'son-of-a-bitch'), -20, polarity_dict)
     ]
 )
-def test_sentence_polarity(sentence, expected, polarity_dict):
+def test_simple_sentence_polarity(sentence, expected, polarity_dict):
     result = get_simple_sentence_polarity(sentence, polarity_dict)
     assert expected == sum(result)
+    assert len(result) == len(sentence)
 
 
-def get_simple_shifted_sentence_polarity(sentence, polarity_dict, shifting_dict):
-    """
-    Flips the polarity of the word before
-
-    Improving pollution == flipped
-    Improving health == flipped (!)
-    """
-    sentence_polarity = []
-    for bef, word in zip(reversed(sentence[0:-1]), reversed(sentence[1:])):
-
-        pol = polarity_dict.get(word, 0)
-        bef_pol = polarity_dict.get(bef, 0)
-        bef_shift = bool(shifting_dict.get(bef, 0))
-
-        if bef_shift:
-            pol *= -1
-
-        sentence_polarity.append(pol)
-
-    #  incl first word
-    sentence_polarity.append(polarity_dict.get(sentence[0], 0))
-    return sentence_polarity
+# Intensity from 0 - 1.0
+negation_dict = {
+    'never': 1.0,
+    'abandon': 0.9,
+    'threat': 0.8,
+    "can't": 0.5
+}
 
 
 @pytest.mark.parametrize(
-    'sentence, expected, polarity_dict, shifting_dict',
+    'sentence, expected, polarity_dict, negation_dict',
     [
-        (('climate', 'change', 'threat', 'success'), 0 + 0 + -20 + -1 * 20, polarity_dict, shifting_dict),
-        (('climate', 'improve', 'sick'), 0 + 20 + -1 * -20, polarity_dict, shifting_dict),
-
-        (('abandon', 'hope'), -20 + -1 * 20, polarity_dict, shifting_dict),
-        (('improve', 'pollute'), 20 + -1 * -20, polarity_dict, shifting_dict),
+        (('never', 'fail'), -1 * -20, polarity_dict, negation_dict),
+        (('abandon', 'hope'), -0.9 * 20, polarity_dict, negation_dict),
+        (('threat', 'success'), -0.8 * 20, polarity_dict, negation_dict),
+        (("can't", 'fail'), - 0.5 * -20, polarity_dict, negation_dict),
+        (("can't", 'improve'), 0.5 * -20, polarity_dict, negation_dict)
     ]
 )
-def test_shifted_polarity(sentence, expected, polarity_dict, shifting_dict):
+def test_simple_negation(sentence, expected, polarity_dict, negation_dict):
     # It is large and stylish, however, I cannot recommend it because of the lid
     # ‘I am not happy with this flashcard at all’.
     # i dont hate this city
+    # (('climate', 'change', 'threat', 'success'), 0 + 0 + -20 + -1 * 20, polarity_dict, shifting_dict),
+    # (('climate', 'improve', 'sick'), 0 + 20 + -1 * -20, polarity_dict, shifting_dict),
 
-    result = get_simple_shifted_sentence_polarity(sentence, polarity_dict, shifting_dict)
+    # (('improve', 'pollute'), 20 + -1 * -20, polarity_dict, shifting_dict),
+
+    result = simple_negation(sentence, polarity_dict, negation_dict)
     assert expected == sum(result)
+    assert len(result) == len(sentence)
+
+
+def simple_negation(sentence, polarity_dict, negation_dict):
+    """
+    Negates the next word in the sentence
+    """
+    sentence_polarity = [polarity_dict.get(sentence[0], 0), ]
+    for first, second in zip(sentence[0:-1], sentence[1:]):
+
+        first_pol = polarity_dict.get(first, 0)
+        second_pol = polarity_dict.get(second, 0)
+
+        if bool(negation_dict.get(first, 0)):
+            second_pol *= - negation_dict.get(first, 0)
+
+        sentence_polarity.append(second_pol)
+
+    return sentence_polarity

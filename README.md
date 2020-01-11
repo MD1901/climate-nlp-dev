@@ -7,3 +7,9 @@ about climate change and use nlp to do a sentiment analysis afterwards.
 
 - lexicon senitment - word level
 - polarity shifting / spacy - sentence level
+
+## `data/negation.txt`
+
+## `data/intensity.txt`
+
+Support existing polarity
