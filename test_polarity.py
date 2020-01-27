@@ -16,6 +16,8 @@ Assuming ’ -> '
 
 import pytest
 
+from models import AdamSimple, get_simple_sentence_polarity
+
 
 polarity_dict = {
     'success': 20,
@@ -27,33 +29,6 @@ polarity_dict = {
     'pollute': -20,
     'fail': -20
 }
-
-
-def get_simple_sentence_polarity(sentence, polarity_dict):
-    # check on stop words
-    return [polarity_dict.get(word, 0) for word in sentence]
-
-class Word:
-    def __init__(self, text, polarity):
-        self.text = text
-        self.polarity = polarity
-
-from collections import namedtuple
-
-Word = namedtuple('Word', ['text', 'polarity'])
-
-
-class ModelWrapper:
-    def __init__(self, polarity_dict):
-        self.polarity_dict = polarity_dict
-
-    # untested
-    def analyse(self, text):
-        sentence = text.split(' ')
-        sentence = [w.lower() for w in sentence]
-        polarities = get_simple_sentence_polarity(sentence, self.polarity_dict)
-        assert len(sentence) == len(polarities)
-        return [Word(word, pol) for word, pol in zip(sentence, polarities)]
 
 
 @pytest.mark.parametrize(

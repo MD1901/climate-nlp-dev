@@ -4,8 +4,15 @@ import json
 import operator
 from pathlib import Path
 
+import pandas as pd
+
+from models import AdamSimple
 from polarity_analyser import Polarity
 
+# do we need a word class? is_neg, intensity
+# norm by count, maybe scale by frequency
+# https://www.youtube.com/watch?v=By4IZeIzxIw min 9:30
+# count num pos versus num neg
 
 HOME = Path.home() / "climate-nlp"
 
@@ -126,22 +133,13 @@ def save_html(doc, sentences, out_file):
 
 
 if __name__ == '__main__':
-    # do we need a word class? is_neg, intensity
-    # norm by count, maybe scale by frequency
-    # https://www.youtube.com/watch?v=By4IZeIzxIw min 9:30
-    # count num pos versus num neg
-
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_id', default='simple-sentence', nargs='?')
     parser.add_argument('--id', default="", nargs='?')
     args = parser.parse_args()
-
-    from test_polarity import ModelWrapper
-
-    import pandas as pd
+    # TODO select this
     # polarity_dict = pd.read_csv('./data/cc_polarity.txt')
-    polarity_dict = pd.read_csv('./data/polarity.txt')
+    polarity_dict = pd.read_csv('./lexica/polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):
@@ -153,17 +151,15 @@ if __name__ == '__main__':
     polarity_dict = new
     models = {
         # 'polarity-shifter': Polarity_with_shifter("english"),
-        'simple-sentence'polarity_dict: ModelWrapper(polarity_dict),
+        'simple-sentence': AdamSimple(polarity_dict),
         'basic': Polarity("english"),
     }
-
     links = text_import(args.id)
-
-    avoids = ['zfd6n39', ]
 
     link = links[-1]
     print(link['url'])
 
+    avoids = ['zfd6n39', ]
     for avoid in avoids:
         links = [l for l in links if avoid not in l['url']]
 
@@ -189,7 +185,7 @@ if __name__ == '__main__':
     #  save to disk
     docs = [add_document_statistics(doc) for doc in polarity_list]
 
-    # break here
+    # break here between model and analyse TODO
 
     import matplotlib.pyplot as plt
 
@@ -217,6 +213,5 @@ if __name__ == '__main__':
     print(papers)
     from yattag import Doc
 
-    #  class Word TODO
     for doc_id in df.loc[:, 'clean-id'].values:
         split_and_save_html(doc_id, polarity_list)
