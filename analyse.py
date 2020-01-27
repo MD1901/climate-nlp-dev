@@ -5,6 +5,10 @@ from pathlib import Path
 
 from polarity_analyser import Polarity_with_shifter
 
+
+HOME = Path.home() / "climate-nlp"
+
+
 def searching_all_files(directory):
     dirpath = Path(directory)
     assert dirpath.is_dir()
@@ -19,11 +23,12 @@ def searching_all_files(directory):
     return file_list
 
 
-def text_import():
+def text_import(home, verbose=True):
     local_list_articles = []
-    path_folder = Path.home() / "climate-nlp" / "articles"
+    path_folder = home / "articles"
     for file_path in searching_all_files(path_folder):
-        print("Importing text from: " + file_path)
+        if verbose:
+            print("Importing text from: " + file_path)
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
             local_list_articles.append(data)
@@ -31,7 +36,7 @@ def text_import():
 
 
 def save_list(pol_list):
-    file_path = Path.home() / "climate-nlp" / "polarity_list.csv"
+    file_path = HOME / "polarity_list.csv"
     result = ""
     for id in pol_list:
          result += str(id) + ", " + str(pol_list[id]) + "\n"
@@ -55,7 +60,7 @@ if __name__ == '__main__':
     from test_polarity import ModelWrapper
 
     import pandas as pd
-    polarity_dict = pd.read_csv('./data/polarity.txt')
+    polarity_dict = pd.read_csv('./data/cc_polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):
@@ -70,7 +75,7 @@ if __name__ == '__main__':
         'simple-sentence': ModelWrapper(polarity_dict)
     }
 
-    links = text_import()
+    links = text_import(HOME)
 
     avoids = ['zfd6n39', ]
 
@@ -192,10 +197,14 @@ if __name__ == '__main__':
                     sentences.append(sentence)
                     sentence = []
 
-        save_html(doc, sentences, out_file='./html/{}.html'.format(doc_id))
+        out_dir = HOME / 'final'
+        out_dir.mkdir(parents=True, exist_ok=True)
+        save_html(
+            doc,
+            sentences,
+            out_file=out_dir / '{}.html'.format(doc_id)
+        )
 
-    html_docs = ('_6119935251001', 'committee-on-climate-change')
-    # for doc_id in html_docs:
     for doc_id in df.loc[:, 'clean-id'].values:
         split_and_save_html(doc_id, polarity_list)
 
