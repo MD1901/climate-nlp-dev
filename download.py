@@ -7,8 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search
 
-
-def web_scraper(newspaper, num_results=100):
+def web_scraper(newspaper, num_results):
     """ returns links from a given newspaper """
     queries = {
         "german": "Klimawandel site:",
@@ -16,7 +15,7 @@ def web_scraper(newspaper, num_results=100):
     }
     website, lang = newspaper
     query = queries[lang] + website
-    links = [j for j in search(query, tld="co.in", num=num_results, start=1, stop=100)]
+    links = [j for j in search(query, tld="co.in", num=num_results, start=1, stop=num_results)]
     return links
 
 
@@ -47,6 +46,7 @@ def import_newspapers(single=None):
     print(newspapers)
     return newspapers
 
+
 def remove_links(links):
 
     avoids = ['bitesize', ]
@@ -57,11 +57,11 @@ def remove_links(links):
     return links
 
 
-def main(language, news):
+def main(language, num_results, news):
     websites = []
     for new in news:
         if new.language == language:
-            links = web_scraper(new)
+            links = web_scraper(new, num_results)
             links = remove_links(links)
 
             for link in links:
@@ -75,6 +75,7 @@ if __name__ == '__main__':
     newspapers = import_newspapers('fox')
     parser = argparse.ArgumentParser()
     parser.add_argument('--language', default="english", nargs='?')
+    parser.add_argument('--number', default="150", nargs='?')
 
     args = parser.parse_args()
-    main(args.language, newspapers)
+    main(args.language, int(args.number), newspapers)

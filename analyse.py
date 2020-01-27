@@ -1,9 +1,10 @@
+import argparse
 from collections import defaultdict
 import json
 import operator
 from pathlib import Path
 
-from polarity_analyser import Polarity_with_shifter
+from polarity_analyser import Polarity
 
 
 HOME = Path.home() / "climate-nlp"
@@ -23,27 +24,105 @@ def searching_all_files(directory):
     return file_list
 
 
-def text_import(home, verbose=True):
-    local_list_articles = []
-    path_folder = home / "articles"
-    for file_path in searching_all_files(path_folder):
-        if verbose:
+def text_import(doc_id=""):
+    if not doc_id == "":
+        local_list_articles = []
+        path_folder = Path.home() / "climate-nlp" / "articles"
+        for file_path in searching_all_files(path_folder):
+            if doc_id in str(file_path):
+                with open(file_path, 'r') as json_file:
+                    data = json.load(json_file)
+                    local_list_articles.append(data)
+        return local_list_articles
+
+    else:
+        local_list_articles = []
+        path_folder = Path.home() / "climate-nlp" / "articles"
+        for file_path in searching_all_files(path_folder):
             print("Importing text from: " + file_path)
-        with open(file_path, 'r') as json_file:
-            data = json.load(json_file)
-            local_list_articles.append(data)
-    return local_list_articles
+            with open(file_path, 'r') as json_file:
+                data = json.load(json_file)
+                local_list_articles.append(data)
+        return local_list_articles
 
 
 def save_list(pol_list):
-    file_path = HOME / "polarity_list.csv"
-    result = ""
-    for id in pol_list:
-         result += str(id) + ", " + str(pol_list[id]) + "\n"
+    file_path = Path.home() / "climate-nlp" / "polarity_list.csv"
 
-    with open(file_path, "w") as file:
-        file.write(result)
+    with open(file_path, "w") as fi:
+        fi.write("id, polarity_value")
+        for doc_id in pol_list:
+            fi.write(str(doc_id) + "; " + str(pol_list[doc_id]))
 
+
+def find_doc(doc_id, polarity_list):
+    for doc in polarity_list:
+        if doc['id']:
+            if doc['id'][:len(doc_id)] == doc_id:
+                return doc
+    return None
+
+
+def add_document_statistics(doc):
+    doc['polarities'] = [res[1] for res in doc['result']]
+    doc['sum'] = sum(doc['polarities']) / len(doc['polarities'])
+    doc['newspaper'] = doc['url'].split('/')[2]
+    return doc
+
+
+def split_and_save_html(doc_id, polarity_list):
+    doc = find_doc(doc_id, polarity_list)
+    # split into sentences
+    sentences = []
+    sentence = []
+    for word, polarity in doc['result']:
+        sentence.append((word, polarity))
+        if word:
+            if word[-1] == '.':
+                sentences.append(sentence)
+                sentence = []
+
+    out_dir = HOME / 'final'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    save_html(
+        doc,
+        sentences,
+        out_file=out_dir / '{}.html'.format(doc_id)
+    )
+
+
+def save_html(doc, sentences, out_file):
+    document, tag, text = Doc().tagtext()
+
+    with tag('html'):
+        with tag('body'):
+            with tag('p'):
+                text('sum {} wc {} {}'.format(
+                    doc['sum'],
+                    len(doc['polarities']),
+                    doc['url']
+                ))
+
+            # for word, polarity in result:
+            for sentence in sentences:
+                with tag('p'):
+
+                    for word, polarity in sentence:
+
+                        clr = '#000000'
+                        if polarity > 0:
+                            clr = '#00cc00'
+                            word += ' ({})'.format(polarity)
+                        elif polarity < 0:
+                            clr = '#ff0000'
+                            word += ' ({})'.format(polarity)
+                        with tag('span', style="color: {}".format(clr)):
+                            text(word + ' ')
+
+    result = document.getvalue()
+
+    with open(out_file, 'w') as fi:
+        fi.write(result)
 
 
 if __name__ == '__main__':
@@ -55,12 +134,14 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_id', default='simple-sentence', nargs='?')
+    parser.add_argument('--id', default="", nargs='?')
     args = parser.parse_args()
 
     from test_polarity import ModelWrapper
 
     import pandas as pd
-    polarity_dict = pd.read_csv('./data/cc_polarity.txt')
+    # polarity_dict = pd.read_csv('./data/cc_polarity.txt')
+    polarity_dict = pd.read_csv('./data/polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):
@@ -72,10 +153,11 @@ if __name__ == '__main__':
     polarity_dict = new
     models = {
         # 'polarity-shifter': Polarity_with_shifter("english"),
-        'simple-sentence': ModelWrapper(polarity_dict)
+        'simple-sentence'polarity_dict: ModelWrapper(polarity_dict),
+        'basic': Polarity("english"),
     }
 
-    links = text_import(HOME)
+    links = text_import(args.id)
 
     avoids = ['zfd6n39', ]
 
@@ -86,7 +168,6 @@ if __name__ == '__main__':
         links = [l for l in links if avoid not in l['url']]
 
     polarity_list = []
-    counter = 0
     model = models[args.model_id]
     list_articles = links
     for article in list_articles:
@@ -103,25 +184,12 @@ if __name__ == '__main__':
             }
         )
 
-
-    def find_doc(doc_id, polarity_list):
-        for doc in polarity_list:
-            if doc['id']:
-                if doc['id'][:len(doc_id)] == doc_id:
-                    return doc
-
-        return None
-
-
-    def add_document_statistics(doc):
-        doc['polarities'] = [res[1] for res in doc['result']]
-        doc['sum'] = sum(doc['polarities']) / len(doc['polarities'])
-        doc['newspaper'] = doc['url'].split('/')[2]
-        return doc
-
     doc_id = 'what-will-another-decade-of-climate-crisis-bring'
     doc = find_doc(doc_id, polarity_list)
+    #  save to disk
     docs = [add_document_statistics(doc) for doc in polarity_list]
+
+    # break here
 
     import matplotlib.pyplot as plt
 
@@ -146,66 +214,9 @@ if __name__ == '__main__':
     print(df.sort_values('sum').head(10))
     print(' ')
     print(df.sort_values('sum', ascending=False).head(10))
-    # print(papers)
+    print(papers)
     from yattag import Doc
 
-    def save_html(doc, sentences, out_file):
-        document, tag, text = Doc().tagtext()
-
-        with tag('html'):
-            with tag('body'):
-                with tag('p'):
-                    text('sum {} wc {} {}'.format(
-                        doc['sum'],
-                        len(doc['polarities']),
-                        doc['url']
-                    ))
-
-                # for word, polarity in result:
-                for sentence in sentences:
-                    with tag('p'):
-
-                        for word, polarity in sentence:
-
-                            clr = '#000000'
-                            if polarity > 0:
-                                clr = '#00cc00'
-                                word += ' ({})'.format(polarity)
-                            elif polarity < 0:
-                                clr = '#ff0000'
-                                word += ' ({})'.format(polarity)
-                            with tag('span', style="color: {}".format(clr)):
-                                text(word + ' ')
-
-        result = document.getvalue()
-
-        with open(out_file, 'w') as fi:
-            fi.write(result)
-
     #  class Word TODO
-
-
-    def split_and_save_html(doc_id, polarity_list):
-        doc = find_doc(doc_id, polarity_list)
-        # split into sentences
-        sentences = []
-        sentence = []
-        for word, polarity in doc['result']:
-            sentence.append((word, polarity))
-            if word:
-                if word[-1] == '.':
-                    sentences.append(sentence)
-                    sentence = []
-
-        out_dir = HOME / 'final'
-        out_dir.mkdir(parents=True, exist_ok=True)
-        save_html(
-            doc,
-            sentences,
-            out_file=out_dir / '{}.html'.format(doc_id)
-        )
-
     for doc_id in df.loc[:, 'clean-id'].values:
         split_and_save_html(doc_id, polarity_list)
-
-
