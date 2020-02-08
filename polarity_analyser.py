@@ -5,6 +5,7 @@ from pathlib import Path
 
 import spacy
 
+
 class Polarity():
 
     def __init__(self, lang):
@@ -34,6 +35,7 @@ class Polarity():
 
         return polarity_list
 
+
 class PolarityWithNeg(Polarity):
     def __init__(self, lang):
         self.lang = lang
@@ -49,6 +51,7 @@ class PolarityWithNeg(Polarity):
 
         return polarity_list
 
+
 class PolarityWithIntens(Polarity):
 
     def sentence_polarity(self, sentence):
@@ -58,9 +61,11 @@ class PolarityWithIntens(Polarity):
 
         return polarity_list
 
+
 class PolarityWithNegWithIntens(Polarity):
     def __init__(self, lang):
         self.lang = lang
+
     def sentence_polarity(self, sentence):
         polarity_list = []
 
