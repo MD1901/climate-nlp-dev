@@ -1,14 +1,33 @@
 from bs4 import BeautifulSoup
 import requests
 
+"""
+https://www.theguardian.com/sustainable-business/blog/environment-climate-change-denier-global-warming
+"""
+
 
 def check_guardian(link):
-    #  see if the year
+    parts = link.split('/')
+
+    unwanted = ['live', 'gallery', 'audio', 'video', 'ng-interactive', 'interactive']
+    for unw in unwanted:
+        if unw in parts:
+            return False
+
     try:
-        int(link.split('/')[4])  # year
-        int(link.split('/')[6])  # day
-        return True
-    except ValueError:
+        #  check if there is a year / str / day
+        #  can be in one of two positions
+        cond1 = parts[4].isdigit() and parts[6].isdigit()
+        cond2 = parts[5].isdigit() and parts[7].isdigit()
+
+        if cond1 or cond2:
+            return True
+        else:
+            print('rejecting {}'.format(link))
+            return False
+
+    #  short link
+    except IndexError:
         print('rejecting {}'.format(link))
         return False
 
@@ -18,17 +37,19 @@ def check(link):
 
 
 def parse_guardian(link):
-
+    cls = 'content__article-body from-content-api js-article__body'
     cls = 'content__article-body from-content-api js-article__body'
     html = requests.get(link).text
     soup = BeautifulSoup(html, features="html.parser")
 
     table = soup.findAll('div', attrs={"class": cls})
+    if len(table) != 1:
+        import pdb; pdb.set_trace()
     assert len(table) == 1
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
-    return article
+    return {'body' :article}
 
 
 newspapers = [

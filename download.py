@@ -96,4 +96,5 @@ if __name__ == '__main__':
             parsed = parse_link(link, newspaper)
             fname = link.split('/')[-1]
             raw.post(html, str(fname)+'.html')
-            interim.post(parsed, str(fname)+'.txt')
+
+            interim.post(json.dumps(parsed), str(fname)+'.json')
