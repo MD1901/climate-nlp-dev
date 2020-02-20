@@ -20,12 +20,12 @@ def searching_all_files(directory):
     return file_list
 
 
-def text_import(id=""):
+def text_import(doc_id=""):
     if not id == "":
         local_list_articles = []
         path_folder = Path.home() / "climate-nlp" / "articles"
         for file_path in searching_all_files(path_folder):
-            if id in str(file_path):
+            if doc_id in str(file_path):
                 with open(file_path, 'r') as json_file:
                     data = json.load(json_file)
                     local_list_articles.append(data)
@@ -57,8 +57,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     list_articles = text_import(args.id)
     polarity_list = {}
-    number_articles = 200
-    counter = 0
     model = Polarity("english")
     for article in list_articles:
         polarity_list[article["id"]] = model.analyse(article["body"])
