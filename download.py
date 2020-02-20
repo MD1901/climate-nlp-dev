@@ -1,5 +1,5 @@
 import argparse
-from collections import namedtuple
+from collections import defaultdict
 import json
 from pathlib import Path
 import requests
@@ -7,61 +7,94 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search
 
-def web_scraper(newspaper, num_results):
+from newspapers import newspapers as all_newspapers
+
+
+def get_newspapers(newspapers):
+    return [n for n in all_newspapers if n['id'] in newspapers]
+
+
+def get_newspaper_links(newspaper, num_results):
     """ returns links from a given newspaper """
     queries = {
-        "german": "Klimawandel site:",
-        "english": "Climate Change site:"
+        "german": "klimawandel site:",
+        "english": "climate change site:"
     }
-    website, lang = newspaper
+    lang = newspaper['language']
+    website = newspaper['site']
+    print('scraping {}'.format(newspaper['id']))
+
     query = queries[lang] + website
-    links = [j for j in search(query, tld="co.in", num=num_results, start=1, stop=num_results)]
+    links = [j for j in search(
+        query,
+        tld="co.in",
+        num=num_results,  # do we need this?
+        start=1,
+        stop=num_results,
+        pause=2.0,
+        user_agent='adam'
+    )]
     return links
 
 
-def save_html(article):
-    newspaper = article[0]
-    url = article[1]
-    lang = article[2]
-    response = requests.get(url)
-    data_home = Path.home() / "climate-nlp" / "raw" /  newspaper.replace(".", "_")
-    data_home.mkdir(parents=True, exist_ok=True)
-    filename = url.split("/")[-1] + ".html"
-    with open(data_home / filename, 'w') as fp:
-        fp.write(response.text)
+def check_links(links, newspaper):
+    if "checker" in newspaper:
+        check = newspaper["checker"]
+        return [l for l in links if check(l)]
+    else:
+        return links
 
-    json_text = {
-        "url": url
-    }
-    json_filename = url.split("/")[-1] + ".json"
-    with open(data_home / json_filename, 'w') as fp:
-        json.dump(json_text, fp)
 
-def import_newspapers():
-    with open("listofwebsites.json", "r") as listofwebsites:
-        newspapers = json.load(listofwebsites)
+def parse_link(html, newspaper):
+    if "parser" in newspaper:
+        parser = newspaper["parser"]
+        return parser(html)
+    else:
+        return html
 
-    Newspaper = namedtuple('Newspaper', ['name', 'language'])
-    newspapers = [Newspaper(tup["url"], tup["lang"]) for tup in newspapers]
-    print(newspapers)
-    return newspapers
-def main(language, num_results, news):
-    websites = []
-    for new in news:
-        if new.language == language:
-            links = web_scraper(new, num_results)
 
-            for link in links:
-                websites.append((new.name, link, new.language))
-                print(websites[-1])
-                save_html(websites[-1])
+class TextFiles:
+    def __init__(self, root):
+        self.root = Path.home() / 'climate-nlp' / root
+        self.root.mkdir(parents=True, exist_ok=True)
+
+    def post(self, data, fi):
+        fi = self.root / fi
+        with open(fi, 'w') as fp:
+            fp.write(data)
 
 
 if __name__ == '__main__':
-    newspapers = import_newspapers()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--language', default="english", nargs='?')
-    parser.add_argument('--number', default="150", nargs='?')
-
+    parser.add_argument(
+        '--newspapers',
+        default="guardian",
+        nargs='*'
+    )
+    parser.add_argument(
+        '--num',
+        default=2,
+        nargs='?',
+        type=int
+    )
     args = parser.parse_args()
-    main(args.language, int(args.number), newspapers)
+    print(args)
+
+    newspapers = args.newspapers
+    newspapers = get_newspapers(newspapers)
+
+    raw = TextFiles('raw')
+    interim = TextFiles('interim')
+
+    articles = defaultdict(list)
+    for newspaper in newspapers:
+        links = get_newspaper_links(newspaper, args.num)
+        links = check_links(links, newspaper)
+
+        for link in links:
+            html = requests.get(link, 'html.parser').text
+            parsed = parse_link(link, newspaper)
+            fname = link.split('/')[-1]
+            raw.post(html, str(fname)+'.html')
+
+            interim.post(json.dumps(parsed), str(fname)+'.json')
