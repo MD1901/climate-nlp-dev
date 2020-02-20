@@ -7,7 +7,7 @@ def word_counter(list_of_articles):
     print(list_of_articles)
     for article in list_of_articles:
         text = article["body"]
-        text.replace(".", " ")
+        text = text.replace(".", " ")
         for word in text.split(" "):
             try:
                 dict_of_words[word] += 1
@@ -26,7 +26,7 @@ def save_dict(dictionary):
     path_folder = Path.home() / "climate-nlp"
     with open(str(path_folder) + "/wordlist.csv", 'w') as csv_file:
         for word in dictionary:
-            csv_file.write(word + " " + str(dictionary[word]) + "\n")
+            csv_file.write(word + ", " + str(dictionary[word]) + "\n")
 def text_import():
     local_list_articles = []
     path_folder = Path.home() / "climate-nlp" / "interim"
