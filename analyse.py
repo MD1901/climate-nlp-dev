@@ -138,7 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_id', default='simple-sentence', nargs='?')
     parser.add_argument('--id', default="", nargs='?')
     args = parser.parse_args()
-    polarity_dict = pd.read_csv('./lexica/default/polarity.txt')
+    polarity_dict = pd.read_csv('./lexica/english/polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):

@@ -11,7 +11,6 @@ analysis
 
 We're trying to get an overview about the sentiments of newspaper reports about climate change.
 
-<<<<<<< HEAD
 In order to do this, we download and extract text from english and german articles about climate change and use nlp to do a sentiment analysis afterwards.
 
 ## Usage
@@ -21,8 +20,6 @@ Run polarity on all `json` files in `~/climate-nlp/articles`, outputs into `~/cl
 ```bash
 python analyze.py
 ```
-
-TODAY = 
 
 ## Examples
 
@@ -50,10 +47,9 @@ more rain in places where it already rains a lot, or less rain in dry places, or
 
 Support the existing polarity of a word
 - dosen't change the sign of the polarity
-=======
+
 In order to do this, we download and extract text from english and german articles
 about climate change and use nlp to do a sentiment analysis afterwards.
->>>>>>> 57d47b286f89db3f1752098eda92b923c559fa5e
 
 step-change
 curb
@@ -62,9 +58,8 @@ rising
 very
 shift
 
-<<<<<<< HEAD
 twenty feet of sea-level rise (1) (the number acts like an intensity)
-=======
+
 - lexicon senitment - word level
 - polarity shifting / spacy - sentence level
 
@@ -72,4 +67,3 @@ twenty feet of sea-level rise (1) (the number acts like an intensity)
 Start by downloading the html files with download.py
 Then parse.py
 analyse.py
->>>>>>> 57d47b286f89db3f1752098eda92b923c559fa5e

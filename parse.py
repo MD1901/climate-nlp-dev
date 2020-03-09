@@ -8,20 +8,6 @@ from bs4 import BeautifulSoup
 
 from download import import_newspapers
 
-
-def searching_all_files(directory):
-    dirpath = Path(directory)
-    assert dirpath.is_dir()
-    file_list = []
-    for dir_path in dirpath.iterdir():
-        if dir_path.is_dir():
-            for file_path in dir_path.iterdir():
-                if file_path.is_file():
-                    if ".html" in str(file_path):
-                        file_list.append(str(file_path))
-    return file_list
-
-
 def searching_all_files(directory):
     dirpath = Path(directory)
     return [a for a in dirpath.glob('**/*.html')]
