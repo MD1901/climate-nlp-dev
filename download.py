@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     newspapers = args.newspapers
     newspapers = get_newspapers(newspapers)
-
+    print(newspapers)
     raw = TextFiles('raw')
     interim = TextFiles('interim')
 
