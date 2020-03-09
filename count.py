@@ -22,11 +22,14 @@ def searching_all_files(directory):
     dirpath = Path(directory)
     return [a for a in dirpath.glob('**/*.json')]
 
+
 def save_dict(dictionary):
     path_folder = Path.home() / "climate-nlp"
     with open(str(path_folder) + "/wordlist.csv", 'w') as csv_file:
         for word in dictionary:
             csv_file.write(word + ", " + str(dictionary[word]) + "\n")
+
+
 def text_import():
     local_list_articles = []
     path_folder = Path.home() / "climate-nlp" / "interim"
@@ -35,6 +38,7 @@ def text_import():
             data = json.load(json_file)
             local_list_articles.append(data)
     return local_list_articles
+
 
 if __name__ == '__main__':
     list_of_articles = text_import()

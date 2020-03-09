@@ -18,23 +18,24 @@ HOME = Path.home() / "climate-nlp"
 
 
 def searching_all_files(directory):
+    print('searching_all_files {}'.format(directory))
     dirpath = Path(directory)
     assert dirpath.is_dir()
     file_list = []
-    for dir_path in dirpath.iterdir():
-        print("Importing files from: " + str(dir_path))
-        if dir_path.is_dir():
-            for file_path in dir_path.iterdir():
-                if file_path.is_file():
-                    if ".json" in str(file_path):
-                        file_list.append(str(file_path))
+    # for dir_path in dirpath.iterdir():
+    #     print("Importing files from: " + str(dir_path))
+    #     if dir_path.is_dir():
+    for file_path in dirpath.iterdir():
+        if file_path.is_file():
+            if ".json" in str(file_path):
+                file_list.append(str(file_path))
     return file_list
 
 
 def text_import(doc_id=""):
     if not doc_id == "":
         local_list_articles = []
-        path_folder = Path.home() / "climate-nlp" / "articles"
+        path_folder = Path.home() / "climate-nlp" / "interim"
         for file_path in searching_all_files(path_folder):
             if doc_id in str(file_path):
                 with open(file_path, 'r') as json_file:
@@ -44,7 +45,7 @@ def text_import(doc_id=""):
 
     else:
         local_list_articles = []
-        path_folder = Path.home() / "climate-nlp" / "articles"
+        path_folder = Path.home() / "climate-nlp" / "interim"
         for file_path in searching_all_files(path_folder):
             print("Importing text from: " + file_path)
             with open(file_path, 'r') as json_file:
@@ -137,9 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_id', default='simple-sentence', nargs='?')
     parser.add_argument('--id', default="", nargs='?')
     args = parser.parse_args()
-    # TODO select this
-    # polarity_dict = pd.read_csv('./data/cc_polarity.txt')
-    #polarity_dict = pd.read_csv('/lexica/english/polarity.txt')
+    polarity_dict = pd.read_csv('./lexica/english/polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):
@@ -155,6 +154,7 @@ if __name__ == '__main__':
         'basic': Polarity("english"),
     }
     links = text_import(args.id)
+    import pdb; pdb.set_trace()
 
     link = links[-1]
     print(link['url'])

@@ -3,6 +3,7 @@ import requests
 
 """
 https://www.theguardian.com/sustainable-business/blog/environment-climate-change-denier-global-warming
+'https://www.theguardian.com/environment/2011/apr/21/countries-responsible-climate-change'
 """
 
 
@@ -48,22 +49,24 @@ def check_fox(link):
             return False
 
 def check(link):
-    return link
+    return True
 
 
 def parse_guardian(link):
     cls = 'content__article-body from-content-api js-article__body'
+    fname = link.split('/')[-1]
     html = requests.get(link).text
     soup = BeautifulSoup(html, features="html.parser")
 
     table = soup.findAll('div', attrs={"class": cls})
+
     if len(table) != 1:
         import pdb; pdb.set_trace()
     assert len(table) == 1
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
-    return {'body' :article}
+    return {'body' :article, 'url': link, 'author': "", 'date': "", 'newspaper': 'guardian', 'id': fname}
 
 def parse_fox(link):
     cls = 'article-body'
