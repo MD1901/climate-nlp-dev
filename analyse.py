@@ -139,7 +139,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # TODO select this
     # polarity_dict = pd.read_csv('./data/cc_polarity.txt')
-    polarity_dict = pd.read_csv('./lexica/polarity.txt')
+    #polarity_dict = pd.read_csv('/lexica/english/polarity.txt')
 
     new = {}
     for row in range(polarity_dict.shape[0]):
