@@ -1,69 +1,48 @@
-data
-- scraping
+# Climate-nlp
 
-lexicon
+Development of climate NLP tools.  Currently developing two tools:
+1. download & parse of climate change newspaper articles
+2. polarity labelling of newspaper articles
 
-models
+## newspapers.py
 
-analysis
+Each newspaper has a parser function, returns `.json`
 
-# climate-nlp-dev
+## download.py
 
-We're trying to get an overview about the sentiments of newspaper reports about climate change.
+Does both downloading and parsing
 
-In order to do this, we download and extract text from english and german articles about climate change and use nlp to do a sentiment analysis afterwards.
-
-## Usage
-
-Run polarity on all `json` files in `~/climate-nlp/articles`, outputs into `~/climate-nlp/final/`
+Uses the newspaper information in `newspapers.py`.
 
 ```bash
-python analyze.py
+/Users/adam/climate-nlp
+├── final
+├── interim
+└── raw
 ```
 
-## Examples
+Will download the HTML into `~/climate-nlp/raw` and parse the article into `.json` in `~/climate-nlp/interim`:
 
-unavoidable success vs unavoidable failure
-cataclysmic, warm 
-make no mistake
-apocalyptic
-succeeded only
-increasing climate change -> negative
-ambition
-like (2) the melting of ice (like makes sentence positive)
+```bash
+python download.py --newspaper --num
+```
 
-## Climate specific examples
+Basic process
+- get links from google search
+- check for unwanted
+- parse using newspaper parser
 
-sea-level rise
-rising temperature
-flooding
-refugees
-fire
-more rain in places where it already rains a lot, or less rain in dry places, or no (-1) rain at all
-
-## `data/negation.txt`
-
-## `data/intensity.txt`
-
-Support the existing polarity of a word
-- dosen't change the sign of the polarity
-
-In order to do this, we download and extract text from english and german articles
-about climate change and use nlp to do a sentiment analysis afterwards.
-
-step-change
-curb
-growing
-rising
-very
-shift
-
-twenty feet of sea-level rise (1) (the number acts like an intensity)
-
-- lexicon senitment - word level
-- polarity shifting / spacy - sentence level
+`grep -rl '"newspaper": "bild"' .`
 
 
-Start by downloading the html files with download.py
-Then parse.py
-analyse.py
+## What is polarity?
+
+- honest / dishonest
+
+- realistic / unrealistic
+- deny / not deny
+
+- future good or bad
+- impacts
+
+- upbeat, hopeless, on the right path (hope, positive, optimistic)

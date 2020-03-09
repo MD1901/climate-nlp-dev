@@ -32,6 +32,7 @@ def check_guardian(link):
         print('rejecting {}'.format(link))
         return False
 
+
 def check_zeit(link):
     parts = link.split('/')
 
@@ -39,6 +40,9 @@ def check_zeit(link):
     for unw in unwanted:
         if unw in parts:
             return False
+        else:
+            return True
+
 
 def check_fox(link):
     parts = link.split('/')
@@ -47,6 +51,9 @@ def check_fox(link):
     for unw in unwanted:
         if unw in parts:
             return False
+        else:
+            return True
+
 
 def check(link):
     return True
@@ -54,7 +61,6 @@ def check(link):
 
 def parse_guardian(link):
     cls = 'content__article-body from-content-api js-article__body'
-    fname = link.split('/')[-1]
     html = requests.get(link).text
     soup = BeautifulSoup(html, features="html.parser")
 
@@ -66,7 +72,8 @@ def parse_guardian(link):
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
-    return {'body' :article, 'url': link, 'author': "", 'date': "", 'newspaper': 'guardian', 'id': fname}
+    return {'body' :article, 'url': link, 'author': "", 'date': "", 'newspaper': 'guardian'}
+
 
 def parse_fox(link):
     cls = 'article-body'
@@ -82,6 +89,7 @@ def parse_fox(link):
     article = ''.join(article)
     return {'body' : article}
 
+
 def parse_newyorker(link):
     cls = 'grid--item body body__container article__body grid-layout__content'
     html = requests.get(link).text
@@ -96,6 +104,7 @@ def parse_newyorker(link):
     article = ''.join(article)
     return {'body' : article}
 
+
 def parse_bild(link):
     cls = 'txt'
     html = requests.get(link).text
@@ -104,11 +113,13 @@ def parse_bild(link):
     table = soup.findAll('div', attrs={"class": cls})
     if len(table) != 1:
         import pdb; pdb.set_trace()
+        raise ValueError(link)
     assert len(table) == 1
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
     return {'body' : article}
+
 
 def parse_zeit(link):
     cls = 'article-page'
@@ -129,40 +140,40 @@ newspapers = [
     {
         "site": "zeit.de",
         "language": "german",
-        "id": "zeit",
+        "newspaper": "zeit",
         "checker": check_zeit,
         "parser": parse_zeit
     },
     {
         "site": "theguardian.com",
         "language": "english",
-        "id": "guardian",
+        "newspaper": "guardian",
         "checker": check_guardian,
         "parser": parse_guardian
     },
     {
         "site": "bild.de",
         "language": "german",
-        "id": "bild",
+        "newspaper": "bild",
         "parser": parse_bild
     },
     {
         "site": "newyorker.com",
         "language": "english",
-        "id": "newyorker.com",
+        "newspaper": "newyorker.com",
         "parser": parse_newyorker
     },
-    {"site": "nytimes.com", "language": "english", "id": "nytimes"},
+    {"site": "nytimes.com", "language": "english", "newspaper": "nytimes"},
     {
         "site": "foxnews.com",
         "language": "english",
-        "id": "fox",
+        "newspaper": "fox",
         "checker": check_fox,
         "parser": parse_fox
 
     },
-    {"site": "bbc.com", "language": "english", "id": "bbc"},
-    {"site": "theaustralian.com.au", "language": "english", "id": "australian"},
-    {"site": "news.sky.com/uk", "language": "english", "id": "skyuk"},
-    {"site": "skynews.com.au", "language": "english", "id": "skyau"}
+    {"site": "bbc.com", "language": "english", "newspaper": "bbc"},
+    {"site": "theaustralian.com.au", "language": "english", "newspaper": "australian"},
+    {"site": "news.sky.com/uk", "language": "english", "newspaper": "skyuk"},
+    {"site": "skynews.com.au", "language": "english", "newspaper": "skyau"}
 ]
