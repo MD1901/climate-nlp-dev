@@ -139,8 +139,8 @@ def which_polarity(word,language = "english"):
 def dict_import(lang, other_mode = ""):
     if other_mode == "neg":
         neg_list = []
-        if lang in "german english":
-            with open(lang + "_neglist.txt", "r") as open_file:
+        if lang in "german,english":
+            with open("/lexica/" + lang + "/negation.txt", "r") as open_file:
                 for line in open_file:
                     neg_list.append(line.replace("\n", ""))
             return neg_list
@@ -148,8 +148,8 @@ def dict_import(lang, other_mode = ""):
             return None
     if other_mode == "intens":
         intens_dict = {}
-        if lang in "german english":
-            with open(lang + "_intenslist.txt", "r") as open_file:
+        if lang in "german,english":
+            with open("/lexica/" + lang + "/intensity.txt", "r") as open_file:
                 for line in open_file:
                     word, value = line.replace("\n", "").split("\t")
                     intens_dict[word] = int(value)
@@ -158,11 +158,12 @@ def dict_import(lang, other_mode = ""):
             return None
     else:
         polarity_dict = {}
-        if lang in "german english":
-            with open(lang + "_wordlist.txt", "r") as open_file:
-                for line in open_file:
-                    word, value = line.replace("\n", "").split("\t")
-                    polarity_dict[word] = int(value)
+        if lang in "german,english":
+            print("language:" + lang)
+            #with open("/lexica/" + lang + "/polarity.txt", "r") as open_file:
+            #    for line in open_file:
+            #        word, value = line.replace("\n", "").split("\t")
+            #        polarity_dict[word] = int(value)
         else:
             return None
 
