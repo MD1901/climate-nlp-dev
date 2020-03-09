@@ -11,7 +11,7 @@ from newspapers import newspapers as all_newspapers
 
 
 def get_newspapers(newspapers):
-    return [n for n in all_newspapers if n['id'] in newspapers]
+    return [n for n in all_newspapers if n['newspaper'] in newspapers]
 
 
 def get_newspaper_links(newspaper, num_results):
@@ -22,7 +22,7 @@ def get_newspaper_links(newspaper, num_results):
     }
     lang = newspaper['language']
     website = newspaper['site']
-    print('scraping {}'.format(newspaper['id']))
+    print('scraping {}'.format(newspaper['newspaper']))
 
     query = queries[lang] + website
     links = [j for j in search(
@@ -45,12 +45,17 @@ def check_links(links, newspaper):
         return links
 
 
-def parse_link(html, newspaper):
+def parse_link(link, newspaper):
     if "parser" in newspaper:
         parser = newspaper["parser"]
-        return parser(html)
+        parsed = parser(link)
+
+        parsed['id'] = link.split('/')[-1]
+        parsed['newspaper'] = newspaper['newspaper']
+        parsed['link'] = link
+        return parsed
     else:
-        return html
+        return link
 
 
 class TextFiles:
@@ -92,7 +97,7 @@ if __name__ == '__main__':
         links = check_links(links, newspaper)
 
         for link in links:
-            html = requests.get(link, 'html.parser').text
+            # html = requests.get(link, 'html.parser').text
             parsed = parse_link(link, newspaper)
             fname = parsed['id']
             raw.post(html, str(fname)+'.html')
