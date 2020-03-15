@@ -1,3 +1,18 @@
+
+
+## What is polarity?
+
+- honest / dishonest
+
+- realistic / unrealistic
+- deny / not deny
+
+- future good or bad
+- impacts
+
+- upbeat, hopeless, on the right path (hope, positive, optimistic)
+
+
 # climate-nlp-dev
 
 We're trying to get an overview about the sentiments of newspaper reports about climate change.

@@ -41,15 +41,3 @@ Word counter (removes stops & lemmatizes):
 ```bash
 python count.py && less ~/climate-nlp/spacy-counts.csv
 ```
-
-## What is polarity?
-
-- honest / dishonest
-
-- realistic / unrealistic
-- deny / not deny
-
-- future good or bad
-- impacts
-
-- upbeat, hopeless, on the right path (hope, positive, optimistic)
