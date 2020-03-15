@@ -6,8 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from models import AdamSimple
-from polarity_analyser import Polarity
+from models import AdamSimple, Polarity
 
 # do we need a word class? is_neg, intensity
 # norm by count, maybe scale by frequency
@@ -154,6 +153,10 @@ if __name__ == '__main__':
         'basic': Polarity("english"),
     }
     links = text_import(args.id)
+
+    # newspaper filter - should be in text_import
+    newspaper = 'guardian'
+    links = [l for l in links if l['newspaper'] == newspaper]
     import pdb; pdb.set_trace()
 
     link = links[-1]

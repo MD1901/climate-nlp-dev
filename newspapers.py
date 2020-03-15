@@ -72,7 +72,7 @@ def parse_guardian(link):
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
-    return {'body' :article, 'url': link, 'author': "", 'date': "", 'newspaper': 'guardian'}
+    return {'body' :article, 'url': link, 'author': "", 'date': "", 'newspaper': 'guardian', 'html': html}
 
 
 def parse_fox(link):

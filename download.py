@@ -100,6 +100,5 @@ if __name__ == '__main__':
             # html = requests.get(link, 'html.parser').text
             parsed = parse_link(link, newspaper)
             fname = parsed['id']
-            raw.post(html, str(fname)+'.html')
-
+            raw.post(parsed['html'], str(fname)+'.html')
             interim.post(json.dumps(parsed), str(fname)+'.json')
