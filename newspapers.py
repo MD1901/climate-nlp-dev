@@ -55,15 +55,24 @@ def check_fox(link):
             return True
 
 
+def check_newyorker(link):
+    if 'books/under-review' in link:
+        return False
+    if '/tag/' in link:
+        return False
+    else:
+        return True
+
+
 def check(link):
     return True
 
 
 def parse_guardian(link):
+    # cls = 'content__article-body from-content-api js-article__body'
     cls = 'content__article-body from-content-api js-article__body'
     html = requests.get(link).text
     soup = BeautifulSoup(html, features="html.parser")
-
     table = soup.findAll('div', attrs={"class": cls})
 
     if len(table) != 1:
@@ -92,17 +101,22 @@ def parse_fox(link):
 
 def parse_newyorker(link):
     cls = 'grid--item body body__container article__body grid-layout__content'
-    html = requests.get(link).text
+    req = requests.get(link)
+    html = req.text
     soup = BeautifulSoup(html, features="html.parser")
-
     table = soup.findAll('div', attrs={"class": cls})
     if len(table) != 1:
-        import pdb; pdb.set_trace()
-    assert len(table) == 1
+        if len(table) >= 2:
+            article = []
+            for t in table:
+                article.extend([p.text for p in t.findAll('p')])
+        else:
+            import pdb; pdb.set_trace()
+            assert len(table) == 1
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
-    return {'body' : article}
+    return {'body' : article, 'html': html, 'newspaper':  'newyorker', 'language': 'english'}
 
 
 def parse_bild(link):
@@ -160,8 +174,9 @@ newspapers = [
     {
         "site": "newyorker.com",
         "language": "english",
-        "newspaper": "newyorker.com",
-        "parser": parse_newyorker
+        "newspaper": "newyorker",
+        "parser": parse_newyorker,
+        "checker": check_newyorker
     },
     {"site": "nytimes.com", "language": "english", "newspaper": "nytimes"},
     {

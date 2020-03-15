@@ -28,7 +28,7 @@ def word_counter(list_of_articles):
 
 def word_counter_spacy(article):
     doc = nlp(article['body'])
-    return [str(w) for w in doc if (not w.is_stop) and (not w.is_punct)]
+    return [str(w.lemma_) for w in doc if (not w.is_stop) and (not w.is_punct) and (not w.is_space)]
 
 
 

@@ -34,6 +34,13 @@ Basic process
 
 `grep -rl '"newspaper": "bild"' .`
 
+## Corpus analysis
+
+Word counter (removes stops & lemmatizes):
+
+```bash
+python count.py && less ~/climate-nlp/spacy-counts.csv
+```
 
 ## What is polarity?
 
