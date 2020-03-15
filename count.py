@@ -18,11 +18,6 @@ def word_counter(list_of_articles):
     return(dict_of_words)
 
 
-def searching_all_files(directory):
-    dirpath = Path(directory)
-    return [a for a in dirpath.glob('**/*.json')]
-
-
 def save_dict(dictionary):
     path_folder = Path.home() / "climate-nlp"
     with open(str(path_folder) + "/wordlist.csv", 'w') as csv_file:
@@ -30,14 +25,7 @@ def save_dict(dictionary):
             csv_file.write(word + ", " + str(dictionary[word]) + "\n")
 
 
-def text_import():
-    local_list_articles = []
-    path_folder = Path.home() / "climate-nlp" / "interim"
-    for file_path in searching_all_files(path_folder):
-        with open(file_path, 'r') as json_file:
-            data = json.load(json_file)
-            local_list_articles.append(data)
-    return local_list_articles
+from analyse import text_import, searching_all_files
 
 
 if __name__ == '__main__':

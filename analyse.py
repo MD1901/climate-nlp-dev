@@ -32,6 +32,11 @@ def searching_all_files(directory):
 
 
 def text_import(doc_id=""):
+    """
+    TODO interim is hardcoded
+
+    doc id used to filter for a single article by it's id
+    """
     if not doc_id == "":
         local_list_articles = []
         path_folder = Path.home() / "climate-nlp" / "interim"
