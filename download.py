@@ -46,12 +46,18 @@ def check_links(links, newspaper):
 
 
 def parse_link(link, newspaper):
+    """
+
+    link (str)
+    newspaper (dict)
+    """
     if "parser" in newspaper:
         parser = newspaper["parser"]
         parsed = parser(link)
 
         parsed['id'] = link.split('/')[-1]
         parsed['newspaper'] = newspaper['newspaper']
+        parsed['language'] = newspaper['language']
         parsed['link'] = link
         return parsed
     else:
