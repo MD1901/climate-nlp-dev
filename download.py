@@ -97,7 +97,7 @@ if __name__ == '__main__':
         links = check_links(links, newspaper)
 
         for link in links:
-            # html = requests.get(link, 'html.parser').text
+            html = requests.get(link, 'html.parser').text
             parsed = parse_link(link, newspaper)
             fname = parsed['id']
             raw.post(html, str(fname)+'.html')

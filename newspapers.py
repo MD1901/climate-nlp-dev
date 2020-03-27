@@ -104,6 +104,19 @@ def parse_newyorker(link):
     article = ''.join(article)
     return {'body' : article}
 
+def parse_faz(link):
+    cls = "atc-TextParagraph"
+    html = requests.get(link).text
+    soup = BeautifulSoup(html, features="html.parser")
+    table = soup.findAll('div', attrs={"class": cls}) #ADAM FRAGEN
+    if len(table) != 1:
+        import pdb; pdb.set_trace()
+        raise ValueError(link)
+    assert len(table) == 1
+
+    article = [p.text for p in table[0].findAll('p')]
+    article = ''.join(article)
+    return {'body' : article}
 
 def parse_bild(link):
     cls = 'txt'
@@ -143,6 +156,12 @@ newspapers = [
         "newspaper": "zeit",
         "checker": check_zeit,
         "parser": parse_zeit
+    },
+    {
+        "site": "faz.net",
+        "language": "german",
+        "newspaper": "faz",
+        "parser": parse_faz
     },
     {
         "site": "theguardian.com",
