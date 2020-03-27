@@ -34,15 +34,10 @@ Basic process
 
 `grep -rl '"newspaper": "bild"' .`
 
+## Corpus analysis
 
-## What is polarity?
+Word counter (removes stops & lemmatizes):
 
-- honest / dishonest
-
-- realistic / unrealistic
-- deny / not deny
-
-- future good or bad
-- impacts
-
-- upbeat, hopeless, on the right path (hope, positive, optimistic)
+```bash
+python count.py && less ~/climate-nlp/spacy-counts.csv
+```

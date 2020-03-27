@@ -8,7 +8,7 @@ def word_counter(list_of_articles):
     dict_of_words_en = {}
     dict_of_words_de = {}
 
-    not_wanted = "\n                                                                    !?%–„“–., ()\" :-"
+    # not_wanted = "\n                                                                    !?%–„“–., ()\" :-"
     print(list_of_articles)
     for article in list_of_articles:
         newspaper = get_newspapers(article["newspaper"])[0]
@@ -19,7 +19,7 @@ def word_counter(list_of_articles):
             spacy_nlp = spacy.load('en_core_web_sm')
         text = article["body"]
         doc = spacy_nlp(text)
-        tokens = [token for token in doc if not (token.is_stop or token.lemma_ in not_wanted)]
+        tokens = [token for token in doc if not (token.is_stop or token.is_stop or token.is_punct)]
         if language == "german":
             for word in tokens:
                 try:

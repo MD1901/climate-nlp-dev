@@ -22,7 +22,6 @@ def get_newspaper_links(newspaper, num_results):
     }
     lang = newspaper['language']
     website = newspaper['site']
-    print('scraping {}'.format(newspaper['newspaper']))
 
     query = queries[lang] + website
     links = [j for j in search(
@@ -46,12 +45,18 @@ def check_links(links, newspaper):
 
 
 def parse_link(link, newspaper):
+    """
+
+    link (str)
+    newspaper (dict)
+    """
     if "parser" in newspaper:
         parser = newspaper["parser"]
         parsed = parser(link)
 
         parsed['id'] = link.split('/')[-1]
         parsed['newspaper'] = newspaper['newspaper']
+        parsed['language'] = newspaper['language']
         parsed['link'] = link
         return parsed
     else:
@@ -71,17 +76,8 @@ class TextFiles:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--newspapers',
-        default="guardian",
-        nargs='*'
-    )
-    parser.add_argument(
-        '--num',
-        default=2,
-        nargs='?',
-        type=int
-    )
+    parser.add_argument('--newspapers', default="guardian", nargs='*')
+    parser.add_argument('--num', default=2, nargs='?', type=int)
     args = parser.parse_args()
     print(args)
 
@@ -93,6 +89,7 @@ if __name__ == '__main__':
 
     articles = defaultdict(list)
     for newspaper in newspapers:
+        print('scraping {} from {}'.format(args.num, newspaper['newspaper']))
         links = get_newspaper_links(newspaper, args.num)
         links = check_links(links, newspaper)
 
@@ -100,6 +97,5 @@ if __name__ == '__main__':
             html = requests.get(link, 'html.parser').text
             parsed = parse_link(link, newspaper)
             fname = parsed['id']
-            raw.post(html, str(fname)+'.html')
-
+            raw.post(parsed['html'], str(fname)+'.html')
             interim.post(json.dumps(parsed), str(fname)+'.json')

@@ -1,3 +1,18 @@
+
+
+## What is polarity?
+
+- honest / dishonest
+
+- realistic / unrealistic
+- deny / not deny
+
+- future good or bad
+- impacts
+
+- upbeat, hopeless, on the right path (hope, positive, optimistic)
+
+
 # climate-nlp-dev
 
 We're trying to get an overview about the sentiments of newspaper reports about climate change.
@@ -35,6 +50,9 @@ more rain in places where it already rains a lot, or less rain in dry places, or
 ## `data/negation.txt`
 
 ## `data/intensity.txt`
+mitigate
+
+natural (1) disasters
 
 Support the existing polarity of a word
 - dosen't change the sign of the polarity

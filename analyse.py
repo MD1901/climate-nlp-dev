@@ -6,8 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from models import AdamSimple
-from polarity_analyser import Polarity
+from models import AdamSimple, Polarity
 
 # do we need a word class? is_neg, intensity
 # norm by count, maybe scale by frequency
@@ -33,6 +32,11 @@ def searching_all_files(directory):
 
 
 def text_import(doc_id=""):
+    """
+    TODO interim is hardcoded
+
+    doc id used to filter for a single article by it's id
+    """
     if not doc_id == "":
         local_list_articles = []
         path_folder = Path.home() / "climate-nlp" / "interim"
@@ -154,7 +158,10 @@ if __name__ == '__main__':
         'basic': Polarity("english"),
     }
     links = text_import(args.id)
-    import pdb; pdb.set_trace()
+
+    # newspaper filter - should be in text_import
+    newspaper = 'guardian'
+    links = [l for l in links if l['newspaper'] == newspaper]
 
     link = links[-1]
     print(link['url'])
