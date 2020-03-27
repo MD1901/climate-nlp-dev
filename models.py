@@ -134,6 +134,7 @@ class PolarityWithNegWithSpacy(Polarity):
                 polarity_sum += which_polarity(word.lemma_)
         return polarity_sum
 
+
 def is_neg(word,language = "english"):
         if language == "german":
             neg_dict = dict_import("german", "neg")
@@ -145,6 +146,7 @@ def is_neg(word,language = "english"):
         else:
             return False
 
+
 def which_intens(word,language = "english"):
         if language == "german":
             intens_dict = dict_import("german", "intens")
@@ -155,6 +157,7 @@ def which_intens(word,language = "english"):
             return intens_dict[word]
         else:
             return 1
+
 
 def which_polarity(word,language = "english"):
         if language == "german":

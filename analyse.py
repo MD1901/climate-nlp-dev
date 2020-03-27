@@ -162,7 +162,6 @@ if __name__ == '__main__':
     # newspaper filter - should be in text_import
     newspaper = 'guardian'
     links = [l for l in links if l['newspaper'] == newspaper]
-    import pdb; pdb.set_trace()
 
     link = links[-1]
     print(link['url'])
