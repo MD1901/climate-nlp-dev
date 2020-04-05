@@ -1,22 +1,20 @@
 from collections import namedtuple
 import json
 from pathlib import Path
-import spacy
+#import spacy
+from spacy_wrapper import load_spacy_wrapper
 from newspapers import newspapers as all_newspapers
+
 
 def word_counter(list_of_articles):
     dict_of_words_en = {}
     dict_of_words_de = {}
 
-    # not_wanted = "\n                                                                    !?%–„“–., ()\" :-"
-    print(list_of_articles)
     for article in list_of_articles:
         newspaper = get_newspapers(article["newspaper"])[0]
         language = newspaper["language"]
-        if language == "german":
-            spacy_nlp = spacy.load('de_core_news_sm')
-        else:
-            spacy_nlp = spacy.load('en_core_web_sm')
+
+        spacy_nlp = load_spacy_wrapper(language, version='standard')
         text = article["body"]
         doc = spacy_nlp(text)
         tokens = [token for token in doc if not (token.is_stop or token.is_stop or token.is_punct)]
@@ -52,20 +50,30 @@ def save_dict(dictionary, suffix):
 
 
 def text_import():
-    local_list_articles = []
+    print('importing articles')
+
+    articles = []
     path_folder = Path.home() / "climate-nlp" / "interim"
     for file_path in searching_all_files(path_folder):
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
-            local_list_articles.append(data)
-    return local_list_articles
+            articles.append(data)
+
+    print('imported {} articles'.format(len(articles)))
+    return articles
 
 def get_newspapers(newspapers):
     return [n for n in all_newspapers if n['newspaper'] in newspapers]
 
 
 if __name__ == '__main__':
-    list_of_articles = text_import()
-    dict_of_wordcounter_de, dict_of_wordcounter_en  = word_counter(list_of_articles)
-    save_dict(dict_of_wordcounter_de, "de")
-    save_dict(dict_of_wordcounter_en, "en")
+    articles = text_import()
+    # dict_of_wordcounter_de, dict_of_wordcounter_en = word_counter(list_of_articles)
+    # print(dict_of_wordcounter_en)
+    # save_dict(dict_of_wordcounter_de, "de")
+    # save_dict(dict_of_wordcounter_en, "en")
+
+    limit = 10
+    for article in articles[:limit]:
+        pass
+
