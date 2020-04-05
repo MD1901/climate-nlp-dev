@@ -8,11 +8,15 @@ def get_merger(nlp):
     def merger(doc):
         # https://stackoverflow.com/questions/50752266/spacy-tokenize-quoted-string/50775597#50775597
         matcher = Matcher(nlp.vocab)
-        pattern = [{'LOWER': 'climate'}, {'LOWER': 'change'}]
-        matcher.add('cc', None, pattern)
 
-        pattern = [{'LOWER': 'fossil'}, {'LOWER': 'fuel'}]
-        matcher.add('ff', None, pattern)
+        matches = [
+            ('ff', None, [{'LOWER': 'fossil'}, {'LOWER': 'fuel'}]),
+            ('cc', None, [{'LOWER': 'climate'}, {'LOWER': 'change'}]),
+            ('gw', None, [{'LOWER': 'global'}, {'LOWER': 'warming'}]),
+            ('gg', None, [{'LOWER': 'greenhouse'}, {'LOWER': 'gas'}]),
+        ]
+        for match in matches:
+             matcher.add(*match)
 
         spans = []
         for m_id, s, e in matcher(doc):

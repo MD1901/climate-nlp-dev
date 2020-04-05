@@ -6,3 +6,9 @@ functions taking iterables instead of single inputs
 list_of_articles versus articles
 
 ## 05.04.2020
+
+functions that do too much
+
+only loading spacy once
+
+

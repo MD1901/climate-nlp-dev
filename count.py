@@ -62,18 +62,34 @@ def text_import():
     print('imported {} articles'.format(len(articles)))
     return articles
 
+
 def get_newspapers(newspapers):
     return [n for n in all_newspapers if n['newspaper'] in newspapers]
 
 
 if __name__ == '__main__':
-    articles = text_import()
     # dict_of_wordcounter_de, dict_of_wordcounter_en = word_counter(list_of_articles)
     # print(dict_of_wordcounter_en)
     # save_dict(dict_of_wordcounter_de, "de")
     # save_dict(dict_of_wordcounter_en, "en")
 
-    limit = 10
+    language = 'english'
+    limit = -1
+    nlp = load_spacy_wrapper(language, version='custom')
+
+    articles = text_import()
+    articles = [a for a  in articles if a['language'] == language]
+
+    from collections import Counter
+    counter = Counter()
+
     for article in articles[:limit]:
-        pass
+        text = article["body"]
+        doc = nlp(text)
+        tokens = [str(token) for token in doc if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)]
+        counter += Counter(tokens)
+
+    counter = dict(counter)
+    counter = {k: v for k, v in sorted(counter.items(), key=lambda i: i[1])}
+    save_dict(counter, 'en-adg')
 

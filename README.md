@@ -40,4 +40,6 @@ Word counter (removes stops & lemmatizes):
 
 ```bash
 python count.py && less ~/climate-nlp/spacy-counts.csv
+
+sort -k2 -t, -nr ~/climate-nlp/wordlisten-adg.csv | less
 ```

@@ -69,13 +69,14 @@ def check(link):
 
 
 def parse_guardian(link):
-    # cls = 'content__article-body from-content-api js-article__body'
     cls = 'content__article-body from-content-api js-article__body'
-    html = requests.get(link).text
+    req = requests.get(link)
+    html = req.text
     soup = BeautifulSoup(html, features="html.parser")
     table = soup.findAll('div', attrs={"class": cls})
 
     if len(table) != 1:
+        print(link, req.status_code)
         import pdb; pdb.set_trace()
     assert len(table) == 1
 
