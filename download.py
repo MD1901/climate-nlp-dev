@@ -108,5 +108,7 @@ if __name__ == '__main__':
                 print('failed {}'.format(link))
                 failed.append(link)
 
-        print(failed)
-        print(len(failed))
+                import pprint
+                pp = pprint.PrettyPrinter()
+                pp.pprint(failed)
+                print('{} links failed'.format(len(failed)))

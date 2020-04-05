@@ -83,13 +83,14 @@ if __name__ == '__main__':
     from collections import Counter
     counter = Counter()
 
-    for article in articles[:limit]:
+    from tqdm import tqdm
+    for article in tqdm(articles[:limit]):
         text = article["body"]
         doc = nlp(text)
         tokens = [str(token).lower() for token in doc if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)]
         counter += Counter(tokens)
 
     counter = dict(counter)
-    counter = {k: v for k, v in sorted(counter.items(), key=lambda i: i[1])}
+    counter = {k: v for k, v in sorted(counter.items(), key=lambda i: i[1], reverse=True)}
     save_dict(counter, 'en-adg')
 

@@ -15,6 +15,8 @@ def get_merger(nlp):
             ('gw', None, [{'LOWER': 'global'}, {'LOWER': 'warming'}]),
             ('gg', None, [{'LOWER': 'greenhouse'}, {'LOWER': 'gas'}]),
             ('cd', None, [{'LOWER': 'carbon'}, {'LOWER': 'dioxide'}]),
+            ('cc', None, [{'LOWER': 'climate'}, {'LOWER': 'crisis'}]),
+            ('gh', None, [{'LOWER': 'global'}, {'LOWER': 'heating'}]),
         ]
         for match in matches:
              matcher.add(*match)

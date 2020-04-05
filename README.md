@@ -34,6 +34,12 @@ Basic process
 
 `grep -rl '"newspaper": "bild"' .`
 
+Count number of `json` in `interim`:
+
+```bash
+ls ~/climate-nlp/interim | wc -l
+```
+
 ## Corpus analysis
 
 Word counter (removes stops & lemmatizes):
