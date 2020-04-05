@@ -47,7 +47,7 @@ def check_zeit(link):
 def check_fox(link):
     parts = link.split('/')
 
-    unwanted = ['category', 'video', 'radio']
+    unwanted = ['category', 'video', 'radio', 'person']
     for unw in unwanted:
         for part in parts:
             if unw in part:
@@ -92,7 +92,7 @@ def parse_fox(link):
 
     table = soup.findAll('div', attrs={"class": cls})
     if len(table) != 1:
-        import pdb; pdb.set_trace()
+        return {}
 
     article = [p.text for p in table[0].findAll('p', attrs={"class": "speakable"})]
     article = ''.join(article)

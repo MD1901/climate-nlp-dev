@@ -87,10 +87,19 @@ if __name__ == '__main__':
     for article in tqdm(articles[:limit]):
         text = article["body"]
         doc = nlp(text)
-        tokens = [str(token).lower() for token in doc if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)]
+        tokens = [
+            #str(token).lower() for token in doc
+            token.lemma_ for token in doc
+            if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)
+        ]
         counter += Counter(tokens)
 
     counter = dict(counter)
     counter = {k: v for k, v in sorted(counter.items(), key=lambda i: i[1], reverse=True)}
     save_dict(counter, 'en-adg')
+
+    counter = [(k, v) for k, v in counter.items()]
+    import pprint
+    pp = pprint.PrettyPrinter()
+    pp.pprint(counter[:10])
 
