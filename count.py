@@ -86,7 +86,7 @@ if __name__ == '__main__':
     for article in articles[:limit]:
         text = article["body"]
         doc = nlp(text)
-        tokens = [str(token) for token in doc if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)]
+        tokens = [str(token).lower() for token in doc if not (token.is_stop or token.is_stop or token.is_punct or token.like_num)]
         counter += Counter(tokens)
 
     counter = dict(counter)
