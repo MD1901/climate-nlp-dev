@@ -13,8 +13,6 @@ import json
 import operator
 from pathlib import Path
 
-import spacy
-
 
 Word = namedtuple('Word', ['text', 'polarity'])
 
