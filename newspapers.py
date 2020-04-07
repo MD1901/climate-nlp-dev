@@ -47,12 +47,13 @@ def check_zeit(link):
 def check_fox(link):
     parts = link.split('/')
 
-    unwanted = ['category']
+    unwanted = ['category', "video"]
+    print(parts)
     for unw in unwanted:
         if unw in parts:
             return False
-        else:
-            return True
+
+    return True
 
 
 def check_newyorker(link):
