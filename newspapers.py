@@ -47,12 +47,11 @@ def check_zeit(link):
 def check_fox(link):
     parts = link.split('/')
 
-    unwanted = ['category', "video"]
-    print(parts)
+    unwanted = ['category', 'video', 'radio', 'person']
     for unw in unwanted:
-        if unw in parts:
-            return False
-
+        for part in parts:
+            if unw in part:
+                return False
     return True
 
 
@@ -70,15 +69,16 @@ def check(link):
 
 
 def parse_guardian(link):
-    # cls = 'content__article-body from-content-api js-article__body'
     cls = 'content__article-body from-content-api js-article__body'
-    html = requests.get(link).text
-    soup = BeautifulSoup(html, features="html.parser")
-    table = soup.findAll('div', attrs={"class": cls})
+    itemprop = 'articleBody'
+    req = requests.get(link)
+    html = req.text
+    soup = BeautifulSoup(html, features="html5lib")
+    #table = soup.findAll('div', attrs={"class": cls})
+    table = soup.findAll('div', attrs={"itemprop": itemprop})
 
     if len(table) != 1:
-        import pdb; pdb.set_trace()
-    assert len(table) == 1
+        return {}
 
     article = [p.text for p in table[0].findAll('p')]
     article = ''.join(article)
@@ -92,12 +92,11 @@ def parse_fox(link):
 
     table = soup.findAll('div', attrs={"class": cls})
     if len(table) != 1:
-        import pdb; pdb.set_trace()
-    assert len(table) == 1
+        return {}
 
     article = [p.text for p in table[0].findAll('p', attrs={"class": "speakable"})]
     article = ''.join(article)
-    return {'body' : article}
+    return {'body' : article, 'html': html}
 
 
 def parse_newyorker(link):

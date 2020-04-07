@@ -1,5 +1,3 @@
-
-
 ## What is polarity?
 
 - honest / dishonest

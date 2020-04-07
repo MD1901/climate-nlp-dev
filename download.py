@@ -77,7 +77,7 @@ class TextFiles:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--newspapers', default="guardian", nargs='*')
-    parser.add_argument('--num', default=2, nargs='?', type=int)
+    parser.add_argument('--n', default=2, nargs='?', type=int)
     args = parser.parse_args()
     print(args)
 
@@ -89,13 +89,26 @@ if __name__ == '__main__':
 
     articles = defaultdict(list)
     for newspaper in newspapers:
-        print('scraping {} from {}'.format(args.num, newspaper['newspaper']))
-        links = get_newspaper_links(newspaper, args.num)
+        print('scraping {} from {}'.format(args.n, newspaper['newspaper']))
+        links = get_newspaper_links(newspaper, args.n)
         links = check_links(links, newspaper)
 
+        failed = []
+
+        #  links = list of urls
         for link in links:
             html = requests.get(link, 'html.parser').text
             parsed = parse_link(link, newspaper)
             fname = parsed['id']
-            raw.post(html, str(fname)+'.html')
-            interim.post(json.dumps(parsed), str(fname)+'.json')
+            if 'body' in parsed:
+                print('saving {}'.format(link))
+                raw.post(parsed['html'], str(fname)+'.html')
+                interim.post(json.dumps(parsed), str(fname)+'.json')
+            else:
+                print('failed {}'.format(link))
+                failed.append(link)
+
+        import pprint
+        pp = pprint.PrettyPrinter()
+        pp.pprint(failed)
+        print('{} links failed'.format(len(failed)))
